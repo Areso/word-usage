@@ -6,6 +6,7 @@ import (
     "strings" //used in splitMultilineStringToMap
     "net/http"
     "github.com/gin-gonic/gin"
+    "github.com/gin-contrib/cors" // used for setup CORS
     "fmt"
 )
 
@@ -82,6 +83,7 @@ func healthcheck(c *gin.Context) {
 func main() {
     gin.SetMode(gin.ReleaseMode)
     router := gin.Default()
+    router.Use(cors.Default())
     router.Use(loadGin)
     router.GET("/get_freq", getFreq)
     router.GET("/healthcheck", healthcheck)
