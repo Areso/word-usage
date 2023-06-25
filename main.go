@@ -2,33 +2,42 @@ package main
 
 import (
     "os" //used in load()
+    "path/filepath"
     "strings" //used in splitMultilineStringToMap
     "net/http"
     "github.com/gin-gonic/gin"
-    "fmt" 
+    "fmt"
 )
 
 func loadFile() string {
-   b, err := os.ReadFile("wordlist10k_en.txt")
-   if err != nil {
-      panic(err)
-   }
-   return string(b)
+    executablePath, err := os.Executable()
+    if err != nil {
+        fmt.Println("Failed to get executable path:", err)
+        return "error"
+    }
+
+    // Get the directory containing the executable
+    executableDir := filepath.Dir(executablePath)
+    b, err := os.ReadFile(executableDir+"/wordlist10k_en.txt")
+    if err != nil {
+        panic(err)
+    }
+    return string(b)
 }
 
 func splitMultilineStringToMap(multilineString string) map[int]string {
-	lines := strings.Split(multilineString, "\n")
-	result := make(map[int]string)
+    lines := strings.Split(multilineString, "\n")
+    result := make(map[int]string)
     thecounter := 1
-	for _, line := range lines {
-		if line == "" {
-			continue // Skip empty lines
-		}
+    for _, line := range lines {
+        if line == "" {
+            continue // Skip empty lines
+        }
         key := thecounter
-		result[key] = line
+        result[key] = line
         thecounter = thecounter+1
-	}
-	return result
+    }
+    return result
 }
 
 func loadGin(c *gin.Context){
@@ -40,12 +49,12 @@ func loadGin(c *gin.Context){
 }
 
 func getKeyByValue(m map[int]string, value string) int {
-	for key, val := range m {
-		if val == value {
-			return key
-		}
-	}
-	return -1
+    for key, val := range m {
+        if val == value {
+            return key
+        }
+    }
+    return -1
 }
 
 func getFreq(c *gin.Context) {
@@ -56,13 +65,13 @@ func getFreq(c *gin.Context) {
         number:= getKeyByValue(mapa, theword)
         fmt.Println(number)
         freq = number
-	} else {
-		// Type assertion failed
-		fmt.Println("Type assertion failed!")
-		// Handle the failure or error case
-		// ...
+    } else {
+        // Type assertion failed
+        fmt.Println("Type assertion failed!")
+        // Handle the failure or error case
+        // ...
         freq = -1
-	}
+    }
     c.IndentedJSON(http.StatusOK, freq)
 }
 
