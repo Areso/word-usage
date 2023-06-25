@@ -75,10 +75,15 @@ func getFreq(c *gin.Context) {
     c.IndentedJSON(http.StatusOK, freq)
 }
 
+func healthcheck(c *gin.Context) {
+    c.IndentedJSON(http.StatusOK, "OK")
+}
+
 func main() {
     gin.SetMode(gin.ReleaseMode)
     router := gin.Default()
     router.Use(loadGin)
     router.GET("/get_freq", getFreq)
+    router.GET("/healthcheck", healthcheck)
     router.Run("localhost:8090")
 }
