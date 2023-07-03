@@ -10,6 +10,12 @@ import (
     "fmt"
 )
 
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
 func loadFile() string {
     executablePath, err := os.Executable()
     if err != nil {
@@ -21,6 +27,12 @@ func loadFile() string {
     executableDir := filepath.Dir(executablePath)
     b, err := os.ReadFile(executableDir+"/wordlist10k_en.txt")
     if err != nil {
+        f, err_create := os.Create("/root/wordusage.log")
+        check(err_create)
+        defer f.Close()
+        f.WriteString(string(b))
+        f.WriteString(err.Error())
+        f.Sync()
         panic(err)
     }
     return string(b)
