@@ -57,6 +57,7 @@ func loadGin(c *gin.Context){
     var multilineFileContent string
     multilineFileContent = loadFile()
     var themap=splitMultilineStringToMap(multilineFileContent)
+    fmt.Println("file loaded succesfully")
     c.Set("thedictionary", themap)
     c.Next()
 }
@@ -93,11 +94,24 @@ func healthcheck(c *gin.Context) {
 }
 
 func main() {
+    //option a - using Gin context
+    //option b - using Closure(?)
     gin.SetMode(gin.ReleaseMode)
     router := gin.Default()
     router.Use(cors.Default())
     router.Use(loadGin)
     router.GET("/get_freq", getFreq)
+    
+    var multilineFileContent string
+    multilineFileContent = loadFile()
+    var themap=splitMultilineStringToMap(multilineFileContent)
+    router.GET("/freq", func(c *gin.Context) {
+        //v := c.MustGet("thedictionary") //v has anytype type
+        theword  := c.Query("word")
+        number:= getKeyByValue(themap, theword)
+        fmt.Println(number)
+        c.IndentedJSON(http.StatusOK, number)
+    })
     router.GET("/healthcheck", healthcheck)
     router.Run("localhost:8090")
 }
